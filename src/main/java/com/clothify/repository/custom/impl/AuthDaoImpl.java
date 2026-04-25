@@ -22,17 +22,26 @@ public class AuthDaoImpl implements AuthDao {
 
             ResultSet rs = psTm.executeQuery();
 
+            System.out.println("Searching email: " + email);
+
             UserCredentialsEntity userCredentials = null;
+
             while (rs.next()) {
+                System.out.println("Found user: " + rs.getString(3));
+                System.out.println("Role: " + rs.getString(5));
+                System.out.println("Password hash: " + rs.getString(4));
+
                 String timeDate = rs.getString(6);
                 timeDate = timeDate.replace(' ', 'T');
+
                 userCredentials = new UserCredentialsEntity(
                         rs.getString(1),
                         rs.getString(2),
                         rs.getString(3),
                         rs.getString(4),
                         rs.getString(5),
-                        LocalDateTime.parse(timeDate));
+                        LocalDateTime.parse(timeDate)
+                );
             }
             return userCredentials;
         }catch (SQLException e) {

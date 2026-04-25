@@ -83,16 +83,16 @@ public class PlaceOrderFormController implements Initializable {
     private TextField txtPhoneNumber;
 
     @FXML
-    private TableColumn<?, ?> colAction;
+    private TableColumn<CartTM, JFXButton> colAction;
 
     @FXML
-    private TableColumn<?, ?> colPrice;
+    private TableColumn<CartTM, Double> colPrice;
 
     @FXML
-    private TableColumn<?, ?> colProductName;
+    private TableColumn<CartTM, String> colProductName;
 
     @FXML
-    private TableColumn<?, ?> colQty;
+    private TableColumn<CartTM, Integer> colQty;
 
     @FXML
     private TableView<CartTM> tblCart;
@@ -102,46 +102,94 @@ public class PlaceOrderFormController implements Initializable {
 
     @Getter
     private static PlaceOrderFormController placeOrderFormController;
+
     private final OrderService service = ServiceFactory.getInstance().getServiceType(ServiceType.ORDER);
     private final ProductService productService = ServiceFactory.getInstance().getServiceType(ServiceType.PRODUCT);
     private final CustomerService customerService = ServiceFactory.getInstance().getServiceType(ServiceType.CUSTOMER);
-    private List<Product> productList;
-    private List<JFXButton> buttonList;
-    private final ObservableList<CartTM> cartList = FXCollections.observableArrayList();
-    private Customer searchedCustomer;
-    private double total;
 
+    private List<Product> productList = new ArrayList<>();
+    private List<JFXButton> buttonList = new ArrayList<>();
+    private final ObservableList<CartTM> cartList = FXCollections.observableArrayList();
+
+    private Customer searchedCustomer;
+    private double total = 0.0;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         placeOrderFormController = this;
+
         buttonList = Arrays.asList(btnGents, btnLadies, btnKids);
-        productList = productService.getAllProducts();
+
+        setupCartTable();
+        setupDefaultValues();
+
+        try {
+            List<Product> products = productService.getAllProducts();
+            productList = products == null ? new ArrayList<>() : products;
+        } catch (Exception e) {
+            e.printStackTrace();
+            productList = new ArrayList<>();
+        }
+
         loadProducts(ProductType.GENTS);
         changeTheButtonStyle(btnGents);
         loadDateTime();
         generateNextID();
 
-        // Add listener to search
-        txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
-            searchProducts(newValue);
-        });
+        if (txtSearch != null) {
+            txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+                searchProducts(newValue == null ? "" : newValue);
+            });
+        }
     }
 
-    // Filter products
+    private void setupCartTable() {
+        colProductName.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        colQty.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        colPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
+        colAction.setCellValueFactory(new PropertyValueFactory<>("btnDelete"));
+        tblCart.setItems(cartList);
+    }
+
+    private void setupDefaultValues() {
+        txtSearch.setText("");
+        txtPhoneNumber.setText("");
+        txtCustomerName.setText("");
+
+        lblSubTotal.setText("0.00");
+        lblDiscount.setText("0.00");
+        lblTotal.setText("LKR 0.00");
+
+        btnPlaceOrder.setDisable(true);
+    }
+
+    private String safeText(String value) {
+        return value == null ? "" : value;
+    }
+
     private void searchProducts(String searchQuery) {
         List<Product> filteredProducts = new ArrayList<>();
 
-        if (searchQuery == null || searchQuery.isEmpty()) {
-            loadProducts(ProductType.GENTS);
-        } else {
-            for (Product product : productList) {
-                if (product.getName().toLowerCase().contains(searchQuery.toLowerCase())) {
-                    filteredProducts.add(product);
-                }
-            }
-            loadProductToGridPane(filteredProducts);
+        if (productList == null) {
+            productList = new ArrayList<>();
         }
+
+        if (searchQuery == null || searchQuery.trim().isEmpty()) {
+            loadProducts(ProductType.GENTS);
+            return;
+        }
+
+        for (Product product : productList) {
+            if (product == null || product.getName() == null) {
+                continue;
+            }
+
+            if (product.getName().toLowerCase().contains(searchQuery.toLowerCase())) {
+                filteredProducts.add(product);
+            }
+        }
+
+        loadProductToGridPane(filteredProducts);
     }
 
     @FXML
@@ -164,6 +212,26 @@ public class PlaceOrderFormController implements Initializable {
 
     @FXML
     void btnPlaceOrderOnAction(ActionEvent event) {
+        if (searchedCustomer == null) {
+            CustomAlert.showAlert(
+                    Alert.AlertType.WARNING,
+                    "Clothify Store",
+                    "Please search/select a customer first.",
+                    "/img/icon/warning-48.png"
+            );
+            return;
+        }
+
+        if (cartList.isEmpty()) {
+            CustomAlert.showAlert(
+                    Alert.AlertType.WARNING,
+                    "Clothify Store",
+                    "Please add at least one product to the cart.",
+                    "/img/icon/warning-48.png"
+            );
+            return;
+        }
+
         Order order = new Order(
                 lblOrderID.getText(),
                 loadDateTime(),
@@ -173,15 +241,16 @@ public class PlaceOrderFormController implements Initializable {
 
         List<OrderDetail> orderDetails = new ArrayList<>();
 
-        cartList.forEach(obj -> {
+        for (CartTM obj : cartList) {
             orderDetails.add(
                     new OrderDetail(
                             lblOrderID.getText(),
                             obj.getProductId(),
                             obj.getQuantity(),
-                            0.0)
+                            0.0
+                    )
             );
-        });
+        }
 
         try {
             if (service.placeOrder(order, orderDetails)) {
@@ -191,13 +260,16 @@ public class PlaceOrderFormController implements Initializable {
                         "Order Placed Successfully",
                         "/img/icon/success-48.png"
                 );
-                clearAll();
-                generateNextID();
+
                 ObservableList<OrderDetail> orderDetailObservableList = FXCollections.observableArrayList();
                 orderDetailObservableList.addAll(orderDetails);
 
                 PDFGenerator pdfGenerator = new PDFGenerator();
                 pdfGenerator.downloadPdf((Stage) btnPlaceOrder.getScene().getWindow(), orderDetailObservableList);
+
+                clearAll();
+                generateNextID();
+
             } else {
                 CustomAlert.showAlert(
                         Alert.AlertType.WARNING,
@@ -207,6 +279,9 @@ public class PlaceOrderFormController implements Initializable {
                 );
             }
         } catch (SQLException e) {
+            CustomAlert.errorAlert("Clothify Store", e);
+        } catch (Exception e) {
+            e.printStackTrace();
             CustomAlert.errorAlert("Clothify Store", e);
         }
     }
@@ -222,22 +297,39 @@ public class PlaceOrderFormController implements Initializable {
             stage.getIcons().add(new Image("img/logo-round.png"));
             stage.show();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            CustomAlert.errorAlert("Clothify Store", e);
         }
     }
 
     @FXML
     void iconFilterOnClick(MouseEvent event) {
-
+        System.out.println("Filter clicked");
     }
 
     @FXML
     void txtPhoneNumberOnAction(ActionEvent event) {
-        searchedCustomer = customerService.searchCustomer(txtPhoneNumber.getText());
+        String phone = txtPhoneNumber.getText();
+
+        if (phone == null || phone.trim().isEmpty()) {
+            CustomAlert.showAlert(
+                    Alert.AlertType.WARNING,
+                    "Clothify Store",
+                    "Please enter customer phone number.",
+                    "/img/icon/warning-48.png"
+            );
+            return;
+        }
+
+        searchedCustomer = customerService.searchCustomer(phone.trim());
+
         if (searchedCustomer != null) {
-            txtCustomerName.setText(searchedCustomer.getName());
-            btnPlaceOrder.setDisable(false);
+            txtCustomerName.setText(safeText(searchedCustomer.getName()));
+            btnPlaceOrder.setDisable(cartList.isEmpty());
         } else {
+            txtCustomerName.setText("");
+            btnPlaceOrder.setDisable(true);
+
             CustomAlert.showAlert(
                     Alert.AlertType.WARNING,
                     "Clothify Store",
@@ -248,49 +340,75 @@ public class PlaceOrderFormController implements Initializable {
     }
 
     @FXML
-    void txtSearchOnAction(ActionEvent event) throws IOException {
+    void txtSearchOnAction(ActionEvent event) {
+        searchProducts(txtSearch.getText());
     }
 
-    //Load Products
     private void loadProducts(ProductType productType) {
         List<Product> categorizedProductList = new ArrayList<>();
 
-        switch (productType) {
-            case GENTS:
-                for (Product product : productList) {
-                    if (product.getCategory().equals("GENTS")) {
-                        categorizedProductList.add(product);
-                    }
-                }
-                break;
-
-            case LADIES:
-                for (Product product : productList) {
-                    if (product.getCategory().equals("LADIES")) {
-                        categorizedProductList.add(product);
-                    }
-                }
-                break;
-            case KIDS:
-                for (Product product : productList) {
-                    if (product.getCategory().equals("KIDS")) {
-                        categorizedProductList.add(product);
-                    }
-                }
-                break;
+        if (productList == null) {
+            productList = new ArrayList<>();
         }
+
+        for (Product product : productList) {
+            if (product == null || product.getCategory() == null) {
+                continue;
+            }
+
+            String category = product.getCategory();
+
+            switch (productType) {
+                case GENTS:
+                    if ("GENTS".equalsIgnoreCase(category)) {
+                        categorizedProductList.add(product);
+                    }
+                    break;
+
+                case LADIES:
+                    if ("LADIES".equalsIgnoreCase(category)) {
+                        categorizedProductList.add(product);
+                    }
+                    break;
+
+                case KIDS:
+                    if ("KIDS".equalsIgnoreCase(category)) {
+                        categorizedProductList.add(product);
+                    }
+                    break;
+            }
+        }
+
         loadProductToGridPane(categorizedProductList);
     }
 
-    //load product to Grid Pane
     private void loadProductToGridPane(List<Product> categorizedProductList) {
         productGrid.getChildren().clear();
+
+        if (categorizedProductList == null || categorizedProductList.isEmpty()) {
+            System.out.println("No products found for this category.");
+            return;
+        }
+
         int column = 0;
         int row = 1;
+
         try {
             for (Product product : categorizedProductList) {
+                if (product == null) {
+                    continue;
+                }
+
+                URL cardUrl = getClass().getResource("/view/common/order/order_product_card.fxml");
+
+                if (cardUrl == null) {
+                    System.out.println("FXML not found: /view/common/order/order_product_card.fxml");
+                    return;
+                }
+
                 FXMLLoader fxmlLoader = new FXMLLoader();
-                fxmlLoader.setLocation(getClass().getResource("/view/common/order/order_product_card.fxml"));
+                fxmlLoader.setLocation(cardUrl);
+
                 AnchorPane anchorPane = fxmlLoader.load();
 
                 OrderProductCardController orderProductCardController = fxmlLoader.getController();
@@ -300,14 +418,13 @@ public class PlaceOrderFormController implements Initializable {
                     column = 0;
                     row++;
                 }
+
                 productGrid.add(anchorPane, column++, row);
 
-                //Grid width
                 productGrid.setMinWidth(Region.USE_COMPUTED_SIZE);
                 productGrid.setPrefWidth(Region.USE_COMPUTED_SIZE);
                 productGrid.setMaxWidth(Region.USE_PREF_SIZE);
 
-                //Grid height
                 productGrid.setMinHeight(Region.USE_COMPUTED_SIZE);
                 productGrid.setPrefHeight(Region.USE_COMPUTED_SIZE);
                 productGrid.setMaxHeight(Region.USE_PREF_SIZE);
@@ -315,16 +432,25 @@ public class PlaceOrderFormController implements Initializable {
                 GridPane.setMargin(anchorPane, new Insets(10));
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            CustomAlert.errorAlert("Clothify Store", e);
         }
     }
 
-    //Product add to cart
     public void addToCart(Product product, Integer quantity) {
-        colProductName.setCellValueFactory(new PropertyValueFactory<>("productName"));
-        colQty.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-        colPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
-        colAction.setCellValueFactory(new PropertyValueFactory<>("btnDelete"));
+        if (product == null) {
+            return;
+        }
+
+        if (quantity == null || quantity <= 0) {
+            CustomAlert.showAlert(
+                    Alert.AlertType.ERROR,
+                    "Clothify Store",
+                    "Invalid quantity.",
+                    "/img/icon/error-48.png"
+            );
+            return;
+        }
 
         if (quantity > product.getQuantity()) {
             CustomAlert.showAlert(
@@ -345,28 +471,29 @@ public class PlaceOrderFormController implements Initializable {
 
         CartTM cartItem = new CartTM(
                 product.getId(),
-                product.getName(),
+                safeText(product.getName()),
                 quantity,
                 product.getUnitPrice(),
                 btnDelete
         );
 
-        // Add event handler to btnDelete
         btnDelete.setOnAction(event -> {
             cartList.remove(cartItem);
             tblCart.setItems(cartList);
             setTotal();
+            btnPlaceOrder.setDisable(searchedCustomer == null || cartList.isEmpty());
         });
 
         cartList.add(cartItem);
         tblCart.setItems(cartList);
         setTotal();
 
+        btnPlaceOrder.setDisable(searchedCustomer == null || cartList.isEmpty());
     }
 
-    //Set Total
     private void setTotal() {
-        total = 0;
+        total = 0.0;
+
         for (CartTM cartTM : cartList) {
             total += cartTM.getUnitPrice() * cartTM.getQuantity();
         }
@@ -375,14 +502,22 @@ public class PlaceOrderFormController implements Initializable {
         lblTotal.setText(String.format("LKR %.2f", total));
     }
 
-    private void changeTheButtonStyle(JFXButton button) {
-        for (JFXButton jfxButton : buttonList) {
-            jfxButton.setStyle("-fx-background-color: #C4E3FF");
+    private void changeTheButtonStyle(JFXButton selectedButton) {
+        if (buttonList == null) {
+            return;
         }
-        button.setStyle("-fx-background-color: #308EDF");
+
+        for (JFXButton button : buttonList) {
+            if (button != null) {
+                button.setStyle("-fx-background-color: #C4E3FF");
+            }
+        }
+
+        if (selectedButton != null) {
+            selectedButton.setStyle("-fx-background-color: #308EDF");
+        }
     }
 
-    //Date
     private LocalDateTime loadDateTime() {
         Date date = new Date();
         SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -391,33 +526,51 @@ public class PlaceOrderFormController implements Initializable {
         lblDate.setText(dateNow.substring(0, 10));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime ldt = LocalDateTime.parse(dateNow, formatter);
-
-        return ldt;
+        return LocalDateTime.parse(dateNow, formatter);
     }
 
-    //Generate Next ID
     private void generateNextID() {
-        String base = "D";
-        int id = Integer.parseInt(service.getLastOrderID());
+        String lastOrderId = null;
 
-        if (id < 10) {
-            base += "00";
-        } else if (id < 100) {
-            base += "0";
+        try {
+            lastOrderId = service.getLastOrderID();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        lblOrderID.setText(base + (id + 1));
+
+        int idNumber = 0;
+
+        if (lastOrderId != null && !lastOrderId.trim().isEmpty()) {
+            String digitsOnly = lastOrderId.replaceAll("[^0-9]", "");
+
+            if (!digitsOnly.isEmpty()) {
+                try {
+                    idNumber = Integer.parseInt(digitsOnly);
+                } catch (NumberFormatException e) {
+                    idNumber = 0;
+                }
+            }
+        }
+
+        int nextId = idNumber + 1;
+        lblOrderID.setText(String.format("D%03d", nextId));
     }
 
-    //Clear Fields
-    private void clearAll(){
-        tblCart.getItems().clear();
-        txtSearch.setText(null);
-        txtPhoneNumber.setText(null);
-        txtCustomerName.setText(null);
+    private void clearAll() {
+        cartList.clear();
+        tblCart.setItems(cartList);
+
+        txtSearch.setText("");
+        txtPhoneNumber.setText("");
+        txtCustomerName.setText("");
+
+        searchedCustomer = null;
+        total = 0.0;
+
         lblSubTotal.setText("0.00");
         lblDiscount.setText("0.00");
         lblTotal.setText("LKR 0.00");
-    }
 
+        btnPlaceOrder.setDisable(true);
+    }
 }

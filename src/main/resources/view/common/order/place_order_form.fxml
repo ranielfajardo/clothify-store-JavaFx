@@ -18,19 +18,47 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane minHeight="895.0" minWidth="1309.0" prefHeight="895.0" prefWidth="1340.0" style="-fx-background-color: #EEEEEE;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.clothify.controller.common.order.PlaceOrderFormController">
+<AnchorPane minHeight="895.0"
+            minWidth="1309.0"
+            prefHeight="895.0"
+            prefWidth="1340.0"
+            style="-fx-background-color: #EEEEEE;"
+            xmlns="http://javafx.com/javafx/19"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.clothify.controller.common.order.PlaceOrderFormController">
+
    <children>
-      <Label layoutX="38.0" layoutY="11.0" opacity="0.83" styleClass="dashboard-heading-font" stylesheets="@../../../css/font.css" text="Place Order">
+
+      <Label layoutX="38.0"
+             layoutY="11.0"
+             opacity="0.83"
+             styleClass="dashboard-heading-font"
+             stylesheets="@../../../css/font.css"
+             text="Place Order">
          <font>
             <Font name="Verdana" size="31.0" />
          </font>
       </Label>
-      <Label layoutX="1178.0" layoutY="23.0" opacity="0.5" styleClass="path-font" stylesheets="@../../../css/font.css" text="Home / Place Order">
+
+      <Label layoutX="1178.0"
+             layoutY="23.0"
+             opacity="0.5"
+             styleClass="path-font"
+             stylesheets="@../../../css/font.css"
+             text="Home / Place Order">
          <font>
             <Font name="Segoe UI Semibold" size="13.0" />
          </font>
       </Label>
-      <TextField fx:id="txtSearch" layoutX="434.0" layoutY="13.0" onAction="#txtSearchOnAction" prefHeight="46.0" prefWidth="442.0" promptText="Search Product...">
+
+      <TextField fx:id="txtSearch"
+                 layoutX="434.0"
+                 layoutY="13.0"
+                 onAction="#txtSearchOnAction"
+                 prefHeight="46.0"
+                 prefWidth="442.0"
+                 promptText="Search Product..."
+                 text="">
          <stylesheets>
             <URL value="@../../../css/text-field.css" />
             <URL value="@../../../css/font.css" />
@@ -43,12 +71,25 @@
             <Insets left="50.0" />
          </padding>
       </TextField>
-      <ImageView fitHeight="26.0" fitWidth="35.0" layoutX="445.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true">
+
+      <ImageView fitHeight="26.0"
+                 fitWidth="35.0"
+                 layoutX="445.0"
+                 layoutY="24.0"
+                 pickOnBounds="true"
+                 preserveRatio="true">
          <image>
             <Image url="@../../../img/icon/dashboard-icon/Search.png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="39.0" fitWidth="35.0" layoutX="892.0" layoutY="20.0" onMouseClicked="#iconFilterOnClick" pickOnBounds="true" preserveRatio="true">
+
+      <ImageView fitHeight="39.0"
+                 fitWidth="35.0"
+                 layoutX="892.0"
+                 layoutY="20.0"
+                 onMouseClicked="#iconFilterOnClick"
+                 pickOnBounds="true"
+                 preserveRatio="true">
          <image>
             <Image url="@../../../img/icon/dashboard-icon/Slider.png" />
          </image>
@@ -56,30 +97,120 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <AnchorPane layoutX="38.0" layoutY="128.0" prefHeight="755.0" prefWidth="929.0" style="-fx-background-color: #ffffff;" styleClass="highlight-card" stylesheets="@../../../css/anchor-pane.css">
+
+      <JFXButton fx:id="btnGents"
+                 layoutX="53.0"
+                 layoutY="82.0"
+                 onAction="#btnGentsOnAction"
+                 prefHeight="35.0"
+                 prefWidth="285.0"
+                 style="-fx-background-color: #C9E6FF; -fx-background-radius: 5;"
+                 styleClass="body-font"
+                 stylesheets="@../../../css/font.css"
+                 text="Gents">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+
+      <JFXButton fx:id="btnLadies"
+                 layoutX="358.0"
+                 layoutY="82.0"
+                 onAction="#btnLadiesOnAction"
+                 prefHeight="35.0"
+                 prefWidth="285.0"
+                 style="-fx-background-color: #C9E6FF; -fx-background-radius: 5;"
+                 styleClass="body-font"
+                 stylesheets="@../../../css/font.css"
+                 text="Ladies">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+
+      <JFXButton fx:id="btnKids"
+                 layoutX="666.0"
+                 layoutY="82.0"
+                 onAction="#btnKidsOnAction"
+                 prefHeight="35.0"
+                 prefWidth="285.0"
+                 style="-fx-background-color: #C9E6FF; -fx-background-radius: 5;"
+                 styleClass="body-font"
+                 stylesheets="@../../../css/font.css"
+                 text="Kids">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+
+      <AnchorPane layoutX="38.0"
+                  layoutY="128.0"
+                  prefHeight="755.0"
+                  prefWidth="929.0"
+                  style="-fx-background-color: #ffffff;"
+                  styleClass="highlight-card"
+                  stylesheets="@../../../css/anchor-pane.css">
+
          <children>
-            <ScrollPane fx:id="productScrollPane" prefHeight="757.0" prefWidth="937.0" styleClass="highlight-card" stylesheets="@../../../css/anchor-pane.css">
+            <ScrollPane fx:id="productScrollPane"
+                        fitToWidth="true"
+                        fitToHeight="true"
+                        prefHeight="757.0"
+                        prefWidth="937.0"
+                        styleClass="highlight-card"
+                        stylesheets="@../../../css/anchor-pane.css">
+
                <content>
-                  <GridPane fx:id="productGrid" prefHeight="238.0" prefWidth="201.0">
+                  <GridPane fx:id="productGrid"
+                            hgap="10.0"
+                            vgap="10.0"
+                            prefHeight="238.0"
+                            prefWidth="890.0">
                      <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0"
+                                        prefHeight="30.0"
+                                        vgrow="SOMETIMES" />
                      </rowConstraints>
                   </GridPane>
                </content>
+
                <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  <Insets bottom="10.0"
+                          left="10.0"
+                          right="10.0"
+                          top="10.0" />
                </padding>
             </ScrollPane>
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="984.0" layoutY="82.0" prefHeight="802.0" prefWidth="348.0" style="-fx-background-color: #ffffff;" styleClass="highlight-card" stylesheets="@../../../css/anchor-pane.css">
+
+      <AnchorPane layoutX="984.0"
+                  layoutY="82.0"
+                  prefHeight="802.0"
+                  prefWidth="348.0"
+                  style="-fx-background-color: #ffffff;"
+                  styleClass="highlight-card"
+                  stylesheets="@../../../css/anchor-pane.css">
+
          <children>
-            <Label layoutX="13.0" layoutY="9.0" styleClass="cart-heading-font" stylesheets="@../../../css/font.css" text="Order Details">
+
+            <Label layoutX="13.0"
+                   layoutY="9.0"
+                   styleClass="cart-heading-font"
+                   stylesheets="@../../../css/font.css"
+                   text="Order Details">
                <font>
                   <Font name="System Bold" size="25.0" />
                </font>
             </Label>
-            <ImageView fitHeight="35.0" fitWidth="33.0" layoutX="291.0" layoutY="11.0" onMouseClicked="#iconAddCustomerOnClick" pickOnBounds="true" preserveRatio="true">
+
+            <ImageView fitHeight="35.0"
+                       fitWidth="33.0"
+                       layoutX="291.0"
+                       layoutY="11.0"
+                       onMouseClicked="#iconAddCustomerOnClick"
+                       pickOnBounds="true"
+                       preserveRatio="true">
                <image>
                   <Image url="@../../../img/icon/dashboard-icon/Add%20User%20Male.png" />
                </image>
@@ -87,22 +218,51 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </ImageView>
-            <Label layoutX="14.0" layoutY="59.0" styleClass="body-font" stylesheets="@../../../css/font.css" text="Order ID : ">
+
+            <Label layoutX="14.0"
+                   layoutY="59.0"
+                   styleClass="body-font"
+                   stylesheets="@../../../css/font.css"
+                   text="Order ID : ">
                <font>
                   <Font size="16.0" />
                </font>
             </Label>
-            <Label fx:id="lblOrderID" layoutX="102.0" layoutY="60.0" styleClass="body-font" stylesheets="@../../../css/font.css" text="P000" textFill="#308edf">
+
+            <Label fx:id="lblOrderID"
+                   layoutX="102.0"
+                   layoutY="60.0"
+                   styleClass="body-font"
+                   stylesheets="@../../../css/font.css"
+                   text="D001"
+                   textFill="#308edf">
                <font>
                   <Font size="16.0" />
                </font>
             </Label>
-            <Label fx:id="lblDate" alignment="CENTER_RIGHT" layoutX="241.0" layoutY="62.0" styleClass="body-font" stylesheets="@../../../css/font.css" text="2024-10-09">
+
+            <Label fx:id="lblDate"
+                   alignment="CENTER_RIGHT"
+                   layoutX="231.0"
+                   layoutY="62.0"
+                   prefWidth="100.0"
+                   styleClass="body-font"
+                   stylesheets="@../../../css/font.css"
+                   text="">
                <font>
                   <Font size="15.0" />
                </font>
             </Label>
-            <TextField fx:id="txtPhoneNumber" layoutX="11.0" layoutY="103.0" onAction="#txtPhoneNumberOnAction" prefHeight="39.0" prefWidth="326.0" promptText="Search customer by Phone Number..." style="-fx-border-color: #C9E6FF; -fx-border-radius: 10;">
+
+            <TextField fx:id="txtPhoneNumber"
+                       layoutX="11.0"
+                       layoutY="103.0"
+                       onAction="#txtPhoneNumberOnAction"
+                       prefHeight="39.0"
+                       prefWidth="326.0"
+                       promptText="Search customer by Phone Number..."
+                       text=""
+                       style="-fx-border-color: #C9E6FF; -fx-border-radius: 10;">
                <stylesheets>
                   <URL value="@../../../css/text-field.css" />
                   <URL value="@../../../css/font.css" />
@@ -112,7 +272,15 @@
                   <String fx:value="body-font" />
                </styleClass>
             </TextField>
-            <TextField fx:id="txtCustomerName" editable="false" layoutX="11.0" layoutY="155.0" prefHeight="39.0" prefWidth="326.0" promptText="Name">
+
+            <TextField fx:id="txtCustomerName"
+                       editable="false"
+                       layoutX="11.0"
+                       layoutY="155.0"
+                       prefHeight="39.0"
+                       prefWidth="326.0"
+                       promptText="Name"
+                       text="">
                <stylesheets>
                   <URL value="@../../../css/text-field.css" />
                   <URL value="@../../../css/font.css" />
@@ -122,16 +290,67 @@
                   <String fx:value="body-font" />
                </styleClass>
             </TextField>
-            <Line endX="216.6666259765625" layoutX="116.0" layoutY="213.0" opacity="0.3" startX="-100.0" />
-            <Line endX="216.6666259765625" layoutX="113.0" layoutY="574.0" opacity="0.3" startX="-100.0" />
-            <AnchorPane layoutX="15.0" layoutY="589.0" prefHeight="39.0" prefWidth="318.0" styleClass="customer-details" stylesheets="@../../../css/text-field.css">
+
+            <Line endX="216.6666259765625"
+                  layoutX="116.0"
+                  layoutY="213.0"
+                  opacity="0.3"
+                  startX="-100.0" />
+
+            <TableView fx:id="tblCart"
+                       layoutX="7.0"
+                       layoutY="223.0"
+                       prefHeight="345.0"
+                       prefWidth="333.0"
+                       styleClass="body-font"
+                       stylesheets="@../../../css/font.css">
+               <columns>
+                  <TableColumn fx:id="colProductName"
+                               prefWidth="176.0"
+                               text="Name" />
+                  <TableColumn fx:id="colQty"
+                               prefWidth="39.0"
+                               text="Qty" />
+                  <TableColumn fx:id="colPrice"
+                               prefWidth="67.0"
+                               text="Price" />
+                  <TableColumn fx:id="colAction"
+                               prefWidth="50.0"
+                               text="" />
+               </columns>
+            </TableView>
+
+            <Line endX="216.6666259765625"
+                  layoutX="113.0"
+                  layoutY="574.0"
+                  opacity="0.3"
+                  startX="-100.0" />
+
+            <AnchorPane layoutX="15.0"
+                        layoutY="589.0"
+                        prefHeight="39.0"
+                        prefWidth="318.0"
+                        styleClass="customer-details"
+                        stylesheets="@../../../css/text-field.css">
                <children>
-                  <Label layoutX="8.0" layoutY="7.0" styleClass="body-font" stylesheets="@../../../css/font.css" text="Subtotal">
+                  <Label layoutX="8.0"
+                         layoutY="7.0"
+                         styleClass="body-font"
+                         stylesheets="@../../../css/font.css"
+                         text="Subtotal">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="lblSubTotal" alignment="CENTER_RIGHT" layoutX="204.0" layoutY="7.0" prefWidth="100.0" styleClass="body-font" stylesheets="@../../../css/font.css" text="0.00">
+
+                  <Label fx:id="lblSubTotal"
+                         alignment="CENTER_RIGHT"
+                         layoutX="204.0"
+                         layoutY="7.0"
+                         prefWidth="100.0"
+                         styleClass="body-font"
+                         stylesheets="@../../../css/font.css"
+                         text="0.00">
                      <font>
                         <Font size="16.0" />
                      </font>
@@ -141,14 +360,32 @@
                   <Insets right="10.0" />
                </padding>
             </AnchorPane>
-            <AnchorPane layoutX="15.0" layoutY="633.0" prefHeight="39.0" prefWidth="318.0" styleClass="customer-details" stylesheets="@../../../css/text-field.css">
+
+            <AnchorPane layoutX="15.0"
+                        layoutY="633.0"
+                        prefHeight="39.0"
+                        prefWidth="318.0"
+                        styleClass="customer-details"
+                        stylesheets="@../../../css/text-field.css">
                <children>
-                  <Label layoutX="8.0" layoutY="7.0" styleClass="body-font" stylesheets="@../../../css/font.css" text="Discount">
+                  <Label layoutX="8.0"
+                         layoutY="7.0"
+                         styleClass="body-font"
+                         stylesheets="@../../../css/font.css"
+                         text="Discount">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="lblDiscount" alignment="CENTER_RIGHT" layoutX="205.0" layoutY="7.0" prefWidth="100.0" styleClass="body-font" stylesheets="@../../../css/font.css" text="0.00">
+
+                  <Label fx:id="lblDiscount"
+                         alignment="CENTER_RIGHT"
+                         layoutX="205.0"
+                         layoutY="7.0"
+                         prefWidth="100.0"
+                         styleClass="body-font"
+                         stylesheets="@../../../css/font.css"
+                         text="0.00">
                      <font>
                         <Font size="16.0" />
                      </font>
@@ -158,27 +395,56 @@
                   <Insets right="10.0" />
                </padding>
             </AnchorPane>
-            <AnchorPane layoutX="15.0" layoutY="679.0" prefHeight="46.0" prefWidth="318.0" styleClass="customer-details" stylesheets="@../../../css/text-field.css">
+
+            <AnchorPane layoutX="15.0"
+                        layoutY="679.0"
+                        prefHeight="46.0"
+                        prefWidth="318.0"
+                        styleClass="customer-details"
+                        stylesheets="@../../../css/text-field.css">
                <children>
-                  <Label layoutX="8.0" layoutY="8.0" styleClass="cart-total-font" stylesheets="@../../../css/font.css" text="Total" textFill="#308edf">
+                  <Label layoutX="8.0"
+                         layoutY="8.0"
+                         styleClass="cart-total-font"
+                         stylesheets="@../../../css/font.css"
+                         text="Total"
+                         textFill="#308edf">
                      <font>
                         <Font size="21.0" />
                      </font>
                   </Label>
-                  <Label fx:id="lblTotal" alignment="CENTER_RIGHT" layoutX="156.0" layoutY="8.0" prefWidth="150.0" styleClass="cart-total-font" stylesheets="@../../../css/font.css" text="LKR 0.00" textFill="#308edf">
+
+                  <Label fx:id="lblTotal"
+                         alignment="CENTER_RIGHT"
+                         layoutX="156.0"
+                         layoutY="8.0"
+                         prefWidth="150.0"
+                         styleClass="cart-total-font"
+                         stylesheets="@../../../css/font.css"
+                         text="LKR 0.00"
+                         textFill="#308edf">
                      <font>
                         <Font size="20.0" />
                      </font>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
                   </Label>
                </children>
                <padding>
                   <Insets right="10.0" />
                </padding>
             </AnchorPane>
-            <JFXButton fx:id="btnPlaceOrder" disable="true" layoutX="153.0" layoutY="743.0" onAction="#btnPlaceOrderOnAction" prefHeight="46.0" prefWidth="180.0" style="-fx-background-color: #308EDF; -fx-border-radius: 20;" styleClass="place-order-button-font" stylesheets="@../../../css/font.css" text="Place Order" textFill="WHITE">
+
+            <JFXButton fx:id="btnPlaceOrder"
+                       disable="true"
+                       layoutX="153.0"
+                       layoutY="743.0"
+                       onAction="#btnPlaceOrderOnAction"
+                       prefHeight="46.0"
+                       prefWidth="180.0"
+                       style="-fx-background-color: #308EDF; -fx-border-radius: 20;"
+                       styleClass="place-order-button-font"
+                       stylesheets="@../../../css/font.css"
+                       text="Place Order"
+                       textFill="WHITE">
                <font>
                   <Font name="Segoe UI Semibold" size="16.0" />
                </font>
@@ -186,18 +452,9 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </JFXButton>
-            <TableView fx:id="tblCart" layoutX="7.0" layoutY="223.0" prefHeight="345.0" prefWidth="333.0" styleClass="body-font" stylesheets="@../../../css/font.css">
-              <columns>
-                <TableColumn fx:id="colProductName" prefWidth="176.0" text="Name" />
-                <TableColumn fx:id="colQty" prefWidth="38.6666259765625" text="Qty" />
-                  <TableColumn fx:id="colPrice" prefWidth="66.6666259765625" text="Price" />
-                  <TableColumn fx:id="colAction" prefWidth="50.666707356770814" />
-              </columns>
-            </TableView>
+
          </children>
       </AnchorPane>
-      <JFXButton fx:id="btnGents" layoutX="53.0" layoutY="82.0" onAction="#btnGentsOnAction" prefHeight="35.0" prefWidth="285.0" style="-fx-background-color: #C9E6FF; -fx-background-radius: 5;" styleClass="body-font" stylesheets="@../../../css/font.css" text="Gents" />
-      <JFXButton fx:id="btnLadies" layoutX="358.0" layoutY="82.0" onAction="#btnLadiesOnAction" prefHeight="35.0" prefWidth="285.0" style="-fx-background-color: #C9E6FF; -fx-background-radius: 5;" styleClass="body-font" stylesheets="@../../../css/font.css" text="Ladies" />
-      <JFXButton fx:id="btnKids" layoutX="666.0" layoutY="82.0" onAction="#btnKidsOnAction" prefHeight="35.0" prefWidth="285.0" style="-fx-background-color: #C9E6FF; -fx-background-radius: 5;" styleClass="body-font" stylesheets="@../../../css/font.css" text="Kids" />
+
    </children>
 </AnchorPane>
