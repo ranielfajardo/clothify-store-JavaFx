@@ -29,7 +29,9 @@ public class LaundryApiClient {
                 response.append(line);
             }
 
+            br.close();
             conn.disconnect();
+
             return response.toString();
 
         } catch (Exception e) {
@@ -57,7 +59,9 @@ public class LaundryApiClient {
                 response.append(line);
             }
 
+            br.close();
             conn.disconnect();
+
             return response.toString();
 
         } catch (Exception e) {
@@ -66,7 +70,7 @@ public class LaundryApiClient {
         }
     }
 
-    public static String addLaundryTransaction(String customerName, double totalPrice, String status) {
+    public static String addLaundryTransaction() {
         try {
             URL url = new URL(BASE_URL + "/add_laundry_transaction.php");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -77,9 +81,14 @@ public class LaundryApiClient {
             conn.setDoOutput(true);
 
             String jsonInput = "{"
-                    + "\"customer_name\":\"" + customerName + "\","
-                    + "\"total_price\":" + totalPrice + ","
-                    + "\"status\":\"" + status + "\""
+                    + "\"id_outlet\":1,"
+                    + "\"id_member\":1,"
+                    + "\"biaya_tambahan\":0,"
+                    + "\"diskon\":0,"
+                    + "\"pajak\":0,"
+                    + "\"status\":\"baru\","
+                    + "\"dibayar\":\"belum dibayar\","
+                    + "\"id_user\":1"
                     + "}";
 
             try (OutputStream os = conn.getOutputStream()) {
@@ -98,12 +107,129 @@ public class LaundryApiClient {
                 response.append(line.trim());
             }
 
+            br.close();
             conn.disconnect();
+
             return response.toString();
 
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed to add laundry transaction: " + e.getMessage();
+        }
+    }
+
+    public static String getLaundryDashboardSummary() {
+        try {
+            URL url = new URL(BASE_URL + "/laundry_summary.php");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/json");
+
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream())
+            );
+
+            StringBuilder response = new StringBuilder();
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                response.append(line);
+            }
+
+            br.close();
+            conn.disconnect();
+
+            return response.toString();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to get laundry dashboard summary: " + e.getMessage();
+        }
+    }
+
+    public static LaundrySummary getLaundrySummary() {
+        LaundrySummary summary = new LaundrySummary();
+
+        try {
+            String json = getLaundryDashboardSummary();
+
+            summary.setNewCount(extractInt(json, "new"));
+            summary.setInProcessCount(extractInt(json, "in_process"));
+            summary.setCompletedCount(extractInt(json, "completed"));
+            summary.setPickedUpCount(extractInt(json, "picked_up"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return summary;
+    }
+
+    private static int extractInt(String json, String key) {
+        try {
+            String searchKey = "\"" + key + "\":";
+            int startIndex = json.indexOf(searchKey);
+
+            if (startIndex == -1) {
+                return 0;
+            }
+
+            startIndex += searchKey.length();
+
+            while (startIndex < json.length() && Character.isWhitespace(json.charAt(startIndex))) {
+                startIndex++;
+            }
+
+            int endIndex = startIndex;
+
+            while (endIndex < json.length() && Character.isDigit(json.charAt(endIndex))) {
+                endIndex++;
+            }
+
+            return Integer.parseInt(json.substring(startIndex, endIndex).trim());
+
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public static class LaundrySummary {
+        private int newCount;
+        private int inProcessCount;
+        private int completedCount;
+        private int pickedUpCount;
+
+        public int getNewCount() {
+            return newCount;
+        }
+
+        public void setNewCount(int newCount) {
+            this.newCount = newCount;
+        }
+
+        public int getInProcessCount() {
+            return inProcessCount;
+        }
+
+        public void setInProcessCount(int inProcessCount) {
+            this.inProcessCount = inProcessCount;
+        }
+
+        public int getCompletedCount() {
+            return completedCount;
+        }
+
+        public void setCompletedCount(int completedCount) {
+            this.completedCount = completedCount;
+        }
+
+        public int getPickedUpCount() {
+            return pickedUpCount;
+        }
+
+        public void setPickedUpCount(int pickedUpCount) {
+            this.pickedUpCount = pickedUpCount;
         }
     }
 }
